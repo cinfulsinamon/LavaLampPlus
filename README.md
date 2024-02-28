@@ -11,5 +11,6 @@ This version has been edited to use ThryEditor for the UI and adds the following
   
 This is my first time editing a shader so please kindly let me know what things are wrong or broken!
 Settings should transfer over if you change from the original shader.
+Credit to Poiyomi shaders for the color adjusting code, the original MIT license is contained with that code in ColorHelpers.hlsl.
 
 Be sure to read the instructions :>
