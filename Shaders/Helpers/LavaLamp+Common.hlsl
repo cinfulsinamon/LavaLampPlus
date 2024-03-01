@@ -13,12 +13,15 @@ static const float cSDFRaymarchMaxSteps = 100;
 
 float _Reflectiveness;
 float _MinReflectiveness;
+float _MinSpecular;
+float _MaxSpecular;
 
 sampler2D _RoughnessMap;
 float4 _RoughnessMap_ST;
 int _RoughnessMapUV;
 int _RoughnessChannel;
-int _MetallicChannel;
+int _ReflectiveChannel;
+int _SpecularChannel;
 float _MinPerceptualRoughness;
 float _MaxPerceptualRoughness;
 
@@ -52,6 +55,11 @@ float4 _DecalMap_ST;
 int _DecalUV;
 float3 _Decal;
 float _DecalAlpha;
+sampler2D _DecalMask;
+float4 _DecalMask_ST;
+int _DecalMaskUV;
+int _DecalMaskChannel;
+bool _UseTintMaskDecal;
 
 int _LavaSubregionCount;
 
@@ -518,12 +526,13 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
     float3 lampColor = GetLavaLampColor(input.bindPosition, traceDirection, thickness, backgroundColor, input.lavaIndex);
 
     //calculate the glass surface lighting
-	float4 decal = tex2D(_DecalMap,TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,_DecalAlpha);
     float roughness = GetRoughness(uv[_RoughnessMapUV]);
 	float4 roughTex = tex2D(_RoughnessMap,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap));
 	float roughmap = roughTex[_RoughnessChannel];
-	float metalmap = roughTex[_MetallicChannel];
+	float metalmap = roughTex[_ReflectiveChannel];
+	float specmap = roughTex[_SpecularChannel];
 	float reflect = max(_Reflectiveness * metalmap,_MinReflectiveness);
+	float specular = max(_MaxSpecular * specmap, _MinSpecular);
 
     //get the cubemap reflection
     float3 ambientSpecular = 0.0;
@@ -542,7 +551,7 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 
 #ifdef LAVA_LAMP_USE_LIGHTING
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
-    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, reflect, lightAttenuation);
+    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, specular, lightAttenuation); //split this for specular slider
     glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
 #endif
 
@@ -560,7 +569,16 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	}
 	else 
 		glassTint = tintTex;
-    float3 finalColor = (10*decal.rgb*decal.a * glassLighting) + glassLighting + ((lampColor*(1-decal.a)) * (1.0 - reflect) * glassTint);
+		
+	float4 decal = tex2D(_DecalMap,TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,_DecalAlpha);
+	float decalMask;
+	if (_UseTintMaskDecal)
+		decalMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_DecalMaskUV], _TintMask))[_DecalMaskChannel];
+	else
+		decalMask = tex2D(_DecalMask, TRANSFORM_TEX(uv[_DecalMaskUV], _DecalMask))[_DecalMaskChannel];
+	decal *= decalMask;
+		
+    float3 finalColor = ((10*decal.rgb*decal.a) * glassLighting)  + ((lampColor*(1-decal.a)) * (1.0 - reflect) * glassTint + glassLighting);
 
     //apply fog (technically this will be applying fog to the background twice but it's not too noticeable in practice)
     UNITY_APPLY_FOG(input.fogCoord, finalColor);
@@ -586,7 +604,7 @@ float4 LavaLampLightingPixelShader(LavaLampLightingPixelInput input, bool isFron
     float3 worldBitangent = cross(input.worldNormal, input.worldTangent.xyz) * input.worldTangent.w * unity_WorldTransformParams.w;
     float3 mappedNormal = GetMappedNormal(uv[_NormalUV], input.worldNormal, input.worldTangent.xyz, worldBitangent, isFrontFace);
     float roughness = GetRoughness(uv[_RoughnessMapUV]);
-	float metalmap = tex2D(_RoughnessMap,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap))[_MetallicChannel];
+	float metalmap = tex2D(_RoughnessMap,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap))[_ReflectiveChannel];
 	float reflect = max((_Reflectiveness * (metalmap)),_MinReflectiveness);
 
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);

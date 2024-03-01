@@ -48,15 +48,19 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Dec("", Float) = 0
 		
 		[HideInInspector] m_start_RefSpec ("Roughness and Reflections", Float) = 0
-        _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_MetallicChannel]}", 2D) = "white" {}
+        _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_ReflectiveChannel,_SpecularChannel]}", 2D) = "white" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _RoughnessMapUV ("UV", Integer) = 0
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _RoughnessChannel ("Roughness Channel", Integer) = 0
-		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _MetallicChannel ("Metallic Channel", Integer) = 0
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _ReflectiveChannel ("Reflectiveness Channel", Integer) = 1
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _SpecularChannel ("Specular Channel", Integer) = 2
         _MinPerceptualRoughness("Min Roughness--{offset:1}", Range(0.0, 1.0)) = 0.1
         _MaxPerceptualRoughness("Max Roughness--{offset:1}", Range(0.0, 1.0)) = 1.0 
 		[Space]
 		_MinReflectiveness("Min Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 0.0
 		_Reflectiveness("Max Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 0.1
+		[Space]
+		_MinSpecular("Min Specularity--{offset:1}", Range(0.0, 1.0)) = 0.0
+		_MaxSpecular("Max Specularity--{offset:1}", Range(0.0, 1.0)) = 1
 		[Space]
         [Toggle] _UseCustomReflectionProbe("Use Custom Reflection Probe", Float) = 0.0
         [NoScaleOffset] _CustomReflectionProbe("Custom Reflection Probe--{offset:1}", Cube) = "black" {}
