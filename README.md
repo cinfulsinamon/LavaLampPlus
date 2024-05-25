@@ -1,5 +1,6 @@
 # Lava Lamp+ Shader
 # [Download the Unity package here](https://github.com/cinfulsinamon/LavaLamp/releases/latest)
+# NOTE: while things technically work this isn't really mean for anyone but me for now until I figure out how to implement things a bit more properly (namely making the decal application less janky).
 A raymarched lava lamp shader intended for use on VRChat avatars. Should work in any Unity project using the Built-in Render Pipeline.
 This version has been edited to use ThryEditor for the UI and adds the following features:
 - UV map selection (slots 1-4)
