@@ -47,6 +47,22 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[Toggle] _UseTintMaskDecal ("Use Tint Mask--{offset:1}", Integer) = 0
 		[HideInInspector] m_end_Dec("", Float) = 0
 		
+		[HideInInspector] m_start_Emission ("Emission--{reference_property:_EmiToggle}", Float) = 0
+		[HideInInspector][ThryToggle(Emi)] _EmiToggle ("Emission", Integer) = 0
+		_EmiCol("Emission Color", Color) = (1.0, 1.0, 1.0, 1.0)
+		_EmiStr       ("Emission Strength",          Range( 0, 1)) = 0
+		_EmiMap("Map--{reference_properties:[_EmiMapUV]}", 2D) = "white" {} 
+		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _EmiMapUV ("UV", Integer) = 0
+		_EmiMask("Mask--{reference_properties:[_EmiMaskUV,_EmiMaskChannel]}", 2D) = "white" {} 
+		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _EmiMaskUV ("UV", Integer) = 0
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _EmiMaskChannel ("Channel", Integer) = 0
+		[Toggle] _UseTintMaskEmi ("Use Tint Mask--{offset:1}", Integer) = 0
+		[Space]
+		_EmiHue       ("Hue Adjust",          Range( 0, 1)) = 0
+		_EmiSaturation ("Saturation Adjust",   Range(-1, 0)) = 0
+		_EmiValue      ("Value Adjust",        Range(-1, 0)) = 0
+		[HideInInspector] m_end_Emission ("", Float) = 0
+		
 		[HideInInspector] m_start_RefSpec ("Roughness and Reflections", Float) = 0
         _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_ReflectiveChannel,_SpecularChannel]}", 2D) = "white" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _RoughnessMapUV ("UV", Integer) = 0

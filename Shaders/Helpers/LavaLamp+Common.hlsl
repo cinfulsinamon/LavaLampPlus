@@ -61,6 +61,21 @@ int _DecalMaskUV;
 int _DecalMaskChannel;
 bool _UseTintMaskDecal;
 
+sampler2D _EmiMap;
+float4 _EmiMap_ST;
+int _EmiMapUV;
+float4 _EmiCol;
+float _EmiStr;
+float _EmiHue;
+float _EmiSaturation;
+float _EmiValue;
+
+sampler2D _EmiMask;
+float4 _EmiMask_ST;
+int _EmiMaskUV;
+int _EmiMaskChannel;
+bool _UseTintMaskEmi;
+
 int _LavaSubregionCount;
 
 bool _UseCustomReflectionProbe;
@@ -555,9 +570,9 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
     glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
 #endif
 
-    //composite the final color
+    //set up and mask tint texture
 	float tintMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_TintMaskUV], _TintMask))[_TintMaskChannel];
-	float4 tintTex = tex2D(_TintMap, TRANSFORM_TEX(uv[_TintMapUV], _TintMap)) *  _Tint * tintMask + 1-tintMask;
+	float4 tintTex = tex2D(_TintMap, TRANSFORM_TEX(uv[_TintMapUV], _TintMap)) *  _Tint * tintMask + (1-tintMask);
 	float3 glassTint;
 	if (_ColAdjToggle){
 		float colMask;
@@ -570,15 +585,27 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	else 
 		glassTint = tintTex;
 		
+	//set up and mask decal texture
 	float4 decal = tex2D(_DecalMap,TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,_DecalAlpha);
 	float decalMask;
 	if (_UseTintMaskDecal)
 		decalMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_DecalMaskUV], _TintMask))[_DecalMaskChannel];
 	else
 		decalMask = tex2D(_DecalMask, TRANSFORM_TEX(uv[_DecalMaskUV], _DecalMask))[_DecalMaskChannel];
-	decal *= decalMask;
 		
-    float3 finalColor = ((10*decal.rgb*decal.a) * glassLighting)  + ((lampColor*(1-decal.a)) * (1.0 - reflect) * glassTint + glassLighting);
+	//set up and mask emission
+	float4 emiMap = tex2D(_EmiMap,TRANSFORM_TEX(uv[_EmiMapUV], _EmiMap));
+	float emiMask; 
+	if (_UseTintMaskEmi)
+		emiMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_EmiMaskUV], _EmiMask))[_EmiMaskChannel];
+	else
+		emiMask = tex2D(_EmiMask,TRANSFORM_TEX(uv[_EmiMaskUV], _EmiMask))[_EmiMaskChannel];
+	float3 emissionTex = (emiMap.rgb * ModifyViaHSV(_EmiCol, _EmiHue, _EmiSaturation, _EmiValue) * emiMask) * _EmiStr;
+		
+	//composite the final color
+	float3 glassColor = (glassLighting + lampColor * glassTint * (1.0 - reflect)) * (1-decal.a);
+	float3 finalColor = glassColor + ((decal.rgb * max(_LightColor0.rgb, .01) * (dot(mappedNormal,_WorldSpaceLightPos0) * 0.5 + 0.5) + glassLighting) * decal.a);
+	finalColor = (finalColor * (1-(emiMask * _EmiStr)) + emissionTex);
 
     //apply fog (technically this will be applying fog to the background twice but it's not too noticeable in practice)
     UNITY_APPLY_FOG(input.fogCoord, finalColor);
