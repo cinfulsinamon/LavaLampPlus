@@ -9,65 +9,35 @@
 
 DECLARE_LAVA_LAMP_CONSTANTS(0);
 
-#if (_LavaSubregionCount > 1)
-    DECLARE_LAVA_LAMP_CONSTANTS(1);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(1)
 
-#if (_LavaSubregionCount > 2)
-    DECLARE_LAVA_LAMP_CONSTANTS(2);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(2)
 
-#if (_LavaSubregionCount > 3)
-    DECLARE_LAVA_LAMP_CONSTANTS(3);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(3)
 
-#if (_LavaSubregionCount > 4)
-    DECLARE_LAVA_LAMP_CONSTANTS(4);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(4)
 
-#if (_LavaSubregionCount > 5)
-    DECLARE_LAVA_LAMP_CONSTANTS(5);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(5)
 
-#if (_LavaSubregionCount > 6)
-    DECLARE_LAVA_LAMP_CONSTANTS(6);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(6)
 
-#if (_LavaSubregionCount > 7)
-    DECLARE_LAVA_LAMP_CONSTANTS(7);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(7)
 
-#if (_LavaSubregionCount > 8)
-    DECLARE_LAVA_LAMP_CONSTANTS(8);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(8)
 
-#if (_LavaSubregionCount > 9)
-    DECLARE_LAVA_LAMP_CONSTANTS(9);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(9)
 
-#if (_LavaSubregionCount > 10)
-    DECLARE_LAVA_LAMP_CONSTANTS(10);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(10)
 
-#if (_LavaSubregionCount > 11)
-    DECLARE_LAVA_LAMP_CONSTANTS(11);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(11)
 
-#if (_LavaSubregionCount > 12)
-    DECLARE_LAVA_LAMP_CONSTANTS(12);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(12)
 
-#if (_LavaSubregionCount > 13)
-    DECLARE_LAVA_LAMP_CONSTANTS(13);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(13)
 
-#if (_LavaSubregionCount > 14)
-    DECLARE_LAVA_LAMP_CONSTANTS(14);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(14)
 
-#if (_LavaSubregionCount > 15)
-    DECLARE_LAVA_LAMP_CONSTANTS(15);
-#endif
+DECLARE_LAVA_LAMP_CONSTANTS(15)
 
 //Setup Parameter Helpers -------------------------------------------------------------------------
 
@@ -75,102 +45,71 @@ LavaLampShapeParameters GetLavaLampShapeParameters(int index)
 {
     LavaLampShapeParameters shapeParameters;
 
-    [branch]
     switch (index)
     {
     default:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 0);
         break;
 
-#if (_LavaSubregionCount > 1)
     case 1:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 1);
         break;
-#endif
 
-#if (_LavaSubregionCount > 2)
     case 2:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 2);
         break;
-#endif
 
-#if (_LavaSubregionCount > 3)
     case 3:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 3);
-        break;
-#endif
+		break;
 
-#if (_LavaSubregionCount > 4)
     case 4:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 4);
         break;
-#endif
 
-#if (_LavaSubregionCount > 5)
     case 5:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 5);
         break;
-#endif
 
-#if (_LavaSubregionCount > 6)
     case 6:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 6);
         break;
-#endif
 
-#if (_LavaSubregionCount > 7)
     case 7:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 7);
         break;
-#endif
 
-#if (_LavaSubregionCount > 8)
     case 8:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 8);
         break;
-#endif
 
-#if (_LavaSubregionCount > 9)
     case 9:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 9);
         break;
-#endif
 
-#if (_LavaSubregionCount > 10)
     case 10:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 10);
         break;
-#endif
 
-#if (_LavaSubregionCount > 11)
     case 11:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 11);
         break;
-#endif
 
-#if (_LavaSubregionCount > 12)
     case 12:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 12);
         break;
-#endif
 
-#if (_LavaSubregionCount > 13)
     case 13:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 13);
         break;
-#endif
 
-#if (_LavaSubregionCount > 14)
     case 14:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 14);
         break;
-#endif
 
-#if (_LavaSubregionCount > 15)
     case 15:
         FILL_LAVA_LAMP_SHAPE_PARAMETERS(shapeParameters, 15);
         break;
-#endif
     }
 
     return shapeParameters;
@@ -180,102 +119,71 @@ LavaLampMaterialParameters GetLavaLampMaterialParameters(int index)
 {
     LavaLampMaterialParameters materialParameters;
 
-    [branch]
     switch (index)
     {
     default:
         FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 0);
         break;
 
-#if (_LavaSubregionCount > 1)
-    case 1:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 1);
-        break;
-#endif
+		case 1:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 1);
+			break;
 
-#if (_LavaSubregionCount > 2)
-    case 2:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 2);
-        break;
-#endif
+		case 2:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 2);
+			break;
 
-#if (_LavaSubregionCount > 3)
-    case 3:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 3);
-        break;
-#endif
+		case 3:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 3);
+			break;
 
-#if (_LavaSubregionCount > 4)
-    case 4:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 4);
-        break;
-#endif
+		case 4:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 4);
+			break;
 
-#if (_LavaSubregionCount > 5)
-    case 5:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 5);
-        break;
-#endif
+		case 5:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 5);
+			break;
 
-#if (_LavaSubregionCount > 6)
-    case 6:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 6);
-        break;
-#endif
+		case 6:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 6);
+			break;
 
-#if (_LavaSubregionCount > 7)
-    case 7:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 7);
-        break;
-#endif
+		case 7:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 7);
+			break;
 
-#if (_LavaSubregionCount > 8)
-    case 8:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 8);
-        break;
-#endif
+		case 8:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 8);
+			break;
 
-#if (_LavaSubregionCount > 9)
-    case 9:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 9);
-        break;
-#endif
+		case 9:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 9);
+			break;
 
-#if (_LavaSubregionCount > 10)
-    case 10:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 10);
-        break;
-#endif
+		case 10:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 10);
+			break;
 
-#if (_LavaSubregionCount > 11)
-    case 11:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 11);
-        break;
-#endif
+		case 11:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 11);
+			break;
 
-#if (_LavaSubregionCount > 12)
-    case 12:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 12);
-        break;
-#endif
+		case 12:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 12);
+			break;
 
-#if (_LavaSubregionCount > 13)
-    case 13:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 13);
-        break;
-#endif
+		case 13:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 13);
+			break;
 
-#if (_LavaSubregionCount > 14)
-    case 14:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 14);
-        break;
-#endif
+		case 14:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 14);
+			break;
 
-#if (_LavaSubregionCount > 15)
-    case 15:
-        FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 15);
-        break;
-#endif
+		case 15:
+			FILL_LAVA_LAMP_MATERIAL_PARAMETERS(materialParameters, 15);
+			break;
     }
 
     return materialParameters;

@@ -4,6 +4,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
   { 
       [HideInInspector] shader_is_using_thry_editor("", Float)=0
       [HideInInspector] shader_master_label ("<color=#ff0000ff>Lava Lamp+</color>", Float) = 0
+	  [HideInInspector] shader_on_swap_to ("--{actions:[{type:SET_PROPERTY,data:render_queue=3000}, {type:SET_PROPERTY,data:render_type=Transparent}]}", Float) = 0
 		
 		//Glass
 		[HideInInspector] m_Glass ("Glass", Float) = 1
@@ -17,7 +18,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[Space]
         [Normal] _NormalMap("Normal Map--{reference_properties:[_NormalUV,_NormalStrength]}", 2D) = "bump" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _NormalUV ("UV", Integer) = 0
-        [HideInInspector] _NormalStrength("Normal Map Strength", Range(0.0, 1.0)) = 1.0
+        [HideInInspector] _NormalStrength("Normal Map Strength", Range(0.0, 10.0)) = 1.0
 		[Space]
         [HDR] _BackgroundColor("Background Color", Color) = (0.0, 0.0, 0.0, 0.0)
         [Toggle] _UseBackgroundCubemap("Use Background Cubemap", Float) = 0.0
@@ -25,7 +26,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_ColNrm ("", Float) = 0
 		
 		[HideInInspector] m_start_ColAdj ("Color Adjust--{reference_property:_ColAdjToggle}", Float) = 0
-		[HideInInspector][ThryToggle(ColAdj)] _ColAdjToggle ("Color Adjust", Integer) = 0
+		[HideInInspector][ToggleUI] _ColAdjToggle ("Color Adjust Toggle", Integer) = 0
 		_ColAdjMask("Mask--{reference_properties:[_ColAdjMaskUV,_ColAdjMaskChannel]}", 2D) = "white" {} 
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _ColAdjMaskUV ("UV", Integer) = 0
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _ColAdjMaskChannel ("Channel", Integer) = 0
@@ -36,7 +37,8 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		_TintValue      ("Value Adjust",        Range(-1, 0)) = 0
 		[HideInInspector] m_end_ColAdj ("", Float) = 0
 		
-		[HideInInspector] m_start_Dec ("Decal", Float) = 0
+		[HideInInspector] m_start_Dec ("Decal--{reference_property:_DecalToggle}", Float) = 0
+		[HideInInspector][ToggleUI] _DecalToggle ("Decal Toggle", Integer) = 0
 		_Decal("Decal Color", Color) = (1.0, 1.0, 1.0, 1.0)
 		_DecalMap("Decal Map--{reference_properties:[_DecalUV,_DecalAlpha]}", 2D) = "black" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _DecalUV ("UV", Integer) = 0
@@ -48,7 +50,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Dec("", Float) = 0
 		
 		[HideInInspector] m_start_Emission ("Emission--{reference_property:_EmiToggle}", Float) = 0
-		[HideInInspector][ThryToggle(Emi)] _EmiToggle ("Emission", Integer) = 0
+		[HideInInspector][ToggleUI] _EmiToggle("Emission", Integer) = 0
 		_EmiCol("Emission Color", Color) = (1.0, 1.0, 1.0, 1.0)
 		_EmiStr       ("Emission Strength",          Range( 0, 1)) = 0
 		_EmiMap("Map--{reference_properties:[_EmiMapUV]}", 2D) = "white" {} 
@@ -141,7 +143,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub0 ("", Float) = 0
 
         //Subregion 1
-		[HideInInspector] m_start_Sub1 ("Subregion 1--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>1}}", Float) = 0
+		[HideInInspector] m_start_Sub1 ("Subregion 1--{condition_showS:_LavaSubregionCount>1}", Float) = 0
         [PowerSlider(2.72)] _LavaScale1("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight1("Top Reservoir Height", Float) = 5.0
@@ -170,7 +172,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub1 ("", Float) = 0
 
         //Subregion 2
-		[HideInInspector] m_start_Sub2 ("Subregion 2--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>2}}", Float) = 0
+		[HideInInspector] m_start_Sub2 ("Subregion 2--{condition_showS:_LavaSubregionCount>2}", Float) = 0
         [PowerSlider(2.72)] _LavaScale2("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight2("Top Reservoir Height", Float) = 5.0
@@ -199,7 +201,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub2 ("", Float) = 0
 
         //Subregion 3
-		[HideInInspector] m_start_Sub3 ("Subregion 3--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>3}}", Float) = 0
+		[HideInInspector] m_start_Sub3 ("Subregion 3--{condition_showS:_LavaSubregionCount>3}", Float) = 0
         [PowerSlider(2.72)] _LavaScale3("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight3("Top Reservoir Height", Float) = 5.0
@@ -228,7 +230,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub3 ("", Float) = 0
 
         //Subregion 4
-		[HideInInspector] m_start_Sub4 ("Subregion 4--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>4}}", Float) = 0
+		[HideInInspector] m_start_Sub4 ("Subregion 4--{condition_showS:_LavaSubregionCount>4}", Float) = 0
         [PowerSlider(2.72)] _LavaScale4("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight4("Top Reservoir Height", Float) = 5.0
@@ -257,7 +259,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub4 ("", Float) = 0
 
         //Subregion 5
-		[HideInInspector] m_start_Sub5 ("Subregion 5--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>5}}", Float) = 0
+		[HideInInspector] m_start_Sub5 ("Subregion 5--{condition_showS:_LavaSubregionCount>5}", Float) = 0
         [PowerSlider(2.72)] _LavaScale5("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight5("Top Reservoir Height", Float) = 5.0
@@ -286,7 +288,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub5 ("", Float) = 0
 
         //Subregion 6
-		[HideInInspector] m_start_Sub6 ("Subregion 6--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>6}}", Float) = 0
+		[HideInInspector] m_start_Sub6 ("Subregion 6--{condition_showS:_LavaSubregionCount>6}", Float) = 0
         [PowerSlider(2.72)] _LavaScale6("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight6("Top Reservoir Height", Float) = 5.0
@@ -315,7 +317,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub6 ("", Float) = 0
 
         //Subregion 7
-		[HideInInspector] m_start_Sub7 ("Subregion 7--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>7}}", Float) = 0
+		[HideInInspector] m_start_Sub7 ("Subregion 7--{condition_showS:_LavaSubregionCount>7}", Float) = 0
         [PowerSlider(2.72)] _LavaScale7("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight7("Top Reservoir Height", Float) = 5.0
@@ -344,7 +346,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub7 ("", Float) = 0
 
         //Subregion 8
-		[HideInInspector] m_start_Sub8 ("Subregion 8--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>8}}", Float) = 0
+		[HideInInspector] m_start_Sub8 ("Subregion 8--{condition_showS:_LavaSubregionCount>8}", Float) = 0
         [PowerSlider(2.72)] _LavaScale8("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight8("Top Reservoir Height", Float) = 5.0
@@ -373,8 +375,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub8 ("", Float) = 0
 
         //Subregion 9
-		[HideInInspector] m_start_Sub9 ("Subregion 9--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>9}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub9)] _Sub9Toggle ("Subregion 9", Float) = 0
+		[HideInInspector] m_start_Sub9 ("Subregion 9--{condition_showS:_LavaSubregionCount>9}", Float) = 0
         [PowerSlider(2.72)] _LavaScale9("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight9("Top Reservoir Height", Float) = 5.0
@@ -403,8 +404,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub9 ("", Float) = 0
 
         //Subregion 10
-		[HideInInspector] m_start_Sub10 ("Subregion 10--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>10}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub10)] _Sub10Toggle ("Subregion 0", Float) = 0
+		[HideInInspector] m_start_Sub10 ("Subregion 10--{condition_showS:_LavaSubregionCount>10}", Float) = 0
         [PowerSlider(2.72)] _LavaScale10("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight10("Top Reservoir Height", Float) = 5.0
@@ -433,8 +433,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub10 ("", Float) = 0
 
         //Subregion 11
-		[HideInInspector] m_start_Sub11 ("Subregion 11--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>11}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub11)] _Sub11Toggle ("Subregion 11", Float) = 0
+		[HideInInspector] m_start_Sub11 ("Subregion 11--{condition_showS:_LavaSubregionCount>11}", Float) = 0
         [PowerSlider(2.72)] _LavaScale11("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight11("Top Reservoir Height", Float) = 5.0
@@ -463,8 +462,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub11 ("", Float) = 0
 
         //Subregion 12
-		[HideInInspector] m_start_Sub12 ("Subregion 12--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>12}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub12)] _Sub12Toggle ("Subregion 12", Float) = 0
+		[HideInInspector] m_start_Sub12 ("Subregion 12--{condition_showS:_LavaSubregionCount>12}", Float) = 0
         [PowerSlider(2.72)] _LavaScale12("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight12("Top Reservoir Height", Float) = 5.0
@@ -493,8 +491,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub12 ("", Float) = 0
 
         //Subregion 13
-		[HideInInspector] m_start_Sub13 ("Subregion 13--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>13}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub13)] _Sub13Toggle ("Subregion 13", Float) = 0
+		[HideInInspector] m_start_Sub13 ("Subregion 13--{condition_showS:_LavaSubregionCount>13}", Float) = 0
         [PowerSlider(2.72)] _LavaScale13("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight13("Top Reservoir Height", Float) = 5.0
@@ -523,8 +520,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub13 ("", Float) = 0
 
         //Subregion 14
-		[HideInInspector] m_start_Sub14 ("Subregion 14--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>14}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub14)] _Sub14Toggle ("Subregion 14", Float) = 0
+		[HideInInspector] m_start_Sub14 ("Subregion 14--{condition_showS:_LavaSubregionCount>14}", Float) = 0
         [PowerSlider(2.72)] _LavaScale14("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight14("Top Reservoir Height", Float) = 5.0
@@ -553,8 +549,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Sub14 ("", Float) = 0
 
         //Subregion 15
-		[HideInInspector] m_start_Sub15 ("Subregion 15--{condition_show:{type:PROPERTY_BOOL,data:_LavaSubregionCount>15}}", Float) = 0
-		[HideInInspector][ThryToggle(Sub15)] _Sub15Toggle ("Subregion 15", Float) = 0
+		[HideInInspector] m_start_Sub15 ("Subregion 15--{condition_showS:_LavaSubregionCount>15}", Float) = 0
         [PowerSlider(2.72)] _LavaScale15("Scale", Range(0.001, 2.0)) = 0.5
 		[Space(10)]
         _LavaTopReservoirHeight15("Top Reservoir Height", Float) = 5.0
@@ -587,9 +582,10 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
         //Mesh Data
 		[HideInInspector] m_start_Mesh ("Mesh Data", Float) = 0
         [KeywordEnum(Disabled, Enabled, Auto)] Lava_Lamp_Bind_Data("Use Mesh Bind Data", Integer) = 2
-        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Positions_Slot("Bind Positions UV Channel", Integer) = 1
-        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Normals_Slot("Bind Normals UV Channel", Integer) = 2
-        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Tangents_Slot("Bind Tangents UV Channel", Integer) = 3
+        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Positions_Slot("Bind Positions UV Channel", Float) = 1.0
+        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Normals_Slot("Bind Normals UV Channel", Float) = 2.0
+        [KeywordEnum(UV5, UV6, UV7, UV8)] Lava_Lamp_Bind_Tangents_Slot("Bind Tangents UV Channel}", Float) = 3.0
+		[Helpbox] _BindDataError("Bind data UV channels should not overlap!--{condition_showS: Lava_Lamp_Bind_Positions_Slot == Lava_Lamp_Bind_Normals_Slot || Lava_Lamp_Bind_Normals_Slot == Lava_Lamp_Bind_Tangents_Slot || Lava_Lamp_Bind_Positions_Slot == Lava_Lamp_Bind_Tangents_Slot}",Float)= 0
         _WorldRecale("World Rescale", Float) = 1.0
 		[HideInInspector] m_end_Mesh ("", Float) = 0
 
@@ -648,13 +644,11 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
             #pragma shader_feature_local LAVA_LAMP_USE_TRANSPARENCY
             #pragma shader_feature_local LAVA_LAMP_DEPTH_INTERSECTION
             #pragma shader_feature_local LAVA_LAMP_USE_LIGHTING
-            
-            #pragma shader_feature_local __ LAVA_LAMP_SUBREGION_COUNT_2 LAVA_LAMP_SUBREGION_COUNT_3 LAVA_LAMP_SUBREGION_COUNT_4 LAVA_LAMP_SUBREGION_COUNT_5 LAVA_LAMP_SUBREGION_COUNT_6 LAVA_LAMP_SUBREGION_COUNT_7 LAVA_LAMP_SUBREGION_COUNT_8 LAVA_LAMP_SUBREGION_COUNT_9 LAVA_LAMP_SUBREGION_COUNT_10 LAVA_LAMP_SUBREGION_COUNT_11 LAVA_LAMP_SUBREGION_COUNT_12 LAVA_LAMP_SUBREGION_COUNT_13 LAVA_LAMP_SUBREGION_COUNT_14 LAVA_LAMP_SUBREGION_COUNT_15 LAVA_LAMP_SUBREGION_COUNT_16
-            
+         
             #pragma shader_feature_local LAVA_LAMP_BIND_DATA_DISABLED LAVA_LAMP_BIND_DATA_ENABLED LAVA_LAMP_BIND_DATA_AUTO
-            #pragma shader_feature_local LAVA_LAMP_BIND_POSITIONS_SLOT_UV2 LAVA_LAMP_BIND_POSITIONS_SLOT_UV3  LAVA_LAMP_BIND_POSITIONS_SLOT_UV4 LAVA_LAMP_BIND_POSITIONS_SLOT_UV5 LAVA_LAMP_BIND_POSITIONS_SLOT_UV6 LAVA_LAMP_BIND_POSITIONS_SLOT_UV7 LAVA_LAMP_BIND_POSITIONS_SLOT_UV8
-            #pragma shader_feature_local LAVA_LAMP_BIND_NORMALS_SLOT_UV2 LAVA_LAMP_BIND_NORMALS_SLOT_UV3 LAVA_LAMP_BIND_NORMALS_SLOT_UV4 LAVA_LAMP_BIND_NORMALS_SLOT_UV5 LAVA_LAMP_BIND_NORMALS_SLOT_UV6 LAVA_LAMP_BIND_NORMALS_SLOT_UV7 LAVA_LAMP_BIND_NORMALS_SLOT_UV8
-            #pragma shader_feature_local LAVA_LAMP_BIND_TANGENTS_SLOT_UV2 LAVA_LAMP_BIND_TANGENTS_SLOT_UV3 LAVA_LAMP_BIND_TANGENTS_SLOT_UV4 LAVA_LAMP_BIND_TANGENTS_SLOT_UV5 LAVA_LAMP_BIND_TANGENTS_SLOT_UV6 LAVA_LAMP_BIND_TANGENTS_SLOT_UV7 LAVA_LAMP_BIND_TANGENTS_SLOT_UV8
+            #pragma shader_feature_local LAVA_LAMP_BIND_POSITIONS_SLOT_UV5 LAVA_LAMP_BIND_POSITIONS_SLOT_UV6 LAVA_LAMP_BIND_POSITIONS_SLOT_UV7 LAVA_LAMP_BIND_POSITIONS_SLOT_UV8
+            #pragma shader_feature_local LAVA_LAMP_BIND_NORMALS_SLOT_UV5 LAVA_LAMP_BIND_NORMALS_SLOT_UV6 LAVA_LAMP_BIND_NORMALS_SLOT_UV7 LAVA_LAMP_BIND_NORMALS_SLOT_UV8
+            #pragma shader_feature_local LAVA_LAMP_BIND_TANGENTS_SLOT_UV5 LAVA_LAMP_BIND_TANGENTS_SLOT_UV6 LAVA_LAMP_BIND_TANGENTS_SLOT_UV7 LAVA_LAMP_BIND_TANGENTS_SLOT_UV8
             
             #pragma vertex LavaLampBaseVertexShader
             #pragma fragment LavaLampBasePixelShader
@@ -682,9 +676,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_fog 
             #pragma multi_compile_instancing
-            
-            #pragma shader_feature_local __ LAVA_LAMP_SUBREGION_COUNT_2 LAVA_LAMP_SUBREGION_COUNT_3 LAVA_LAMP_SUBREGION_COUNT_4 LAVA_LAMP_SUBREGION_COUNT_5 LAVA_LAMP_SUBREGION_COUNT_6 LAVA_LAMP_SUBREGION_COUNT_7 LAVA_LAMP_SUBREGION_COUNT_8 LAVA_LAMP_SUBREGION_COUNT_9 LAVA_LAMP_SUBREGION_COUNT_10 LAVA_LAMP_SUBREGION_COUNT_11 LAVA_LAMP_SUBREGION_COUNT_12 LAVA_LAMP_SUBREGION_COUNT_13 LAVA_LAMP_SUBREGION_COUNT_14 LAVA_LAMP_SUBREGION_COUNT_15 LAVA_LAMP_SUBREGION_COUNT_16
-            
+			
             #pragma shader_feature_local LAVA_LAMP_BIND_DATA_DISABLED LAVA_LAMP_BIND_DATA_ENABLED LAVA_LAMP_BIND_DATA_AUTO
             #pragma shader_feature_local LAVA_LAMP_BIND_POSITIONS_SLOT_UV2 LAVA_LAMP_BIND_POSITIONS_SLOT_UV3  LAVA_LAMP_BIND_POSITIONS_SLOT_UV4 LAVA_LAMP_BIND_POSITIONS_SLOT_UV5 LAVA_LAMP_BIND_POSITIONS_SLOT_UV6 LAVA_LAMP_BIND_POSITIONS_SLOT_UV7 LAVA_LAMP_BIND_POSITIONS_SLOT_UV8
             
@@ -712,9 +704,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
             
-            #pragma shader_feature_local __ LAVA_LAMP_SUBREGION_COUNT_2 LAVA_LAMP_SUBREGION_COUNT_3 LAVA_LAMP_SUBREGION_COUNT_4 LAVA_LAMP_SUBREGION_COUNT_5 LAVA_LAMP_SUBREGION_COUNT_6 LAVA_LAMP_SUBREGION_COUNT_7 LAVA_LAMP_SUBREGION_COUNT_8 LAVA_LAMP_SUBREGION_COUNT_9 LAVA_LAMP_SUBREGION_COUNT_10 LAVA_LAMP_SUBREGION_COUNT_11 LAVA_LAMP_SUBREGION_COUNT_12 LAVA_LAMP_SUBREGION_COUNT_13 LAVA_LAMP_SUBREGION_COUNT_14 LAVA_LAMP_SUBREGION_COUNT_15 LAVA_LAMP_SUBREGION_COUNT_16
-            
-            #pragma shader_feature_local LAVA_LAMP_BIND_DATA_DISABLED LAVA_LAMP_BIND_DATA_ENABLED LAVA_LAMP_BIND_DATA_AUTO
+			#pragma shader_feature_local LAVA_LAMP_BIND_DATA_DISABLED LAVA_LAMP_BIND_DATA_ENABLED LAVA_LAMP_BIND_DATA_AUTO
             #pragma shader_feature_local LAVA_LAMP_BIND_POSITIONS_SLOT_UV2 LAVA_LAMP_BIND_POSITIONS_SLOT_UV3  LAVA_LAMP_BIND_POSITIONS_SLOT_UV4 LAVA_LAMP_BIND_POSITIONS_SLOT_UV5 LAVA_LAMP_BIND_POSITIONS_SLOT_UV6 LAVA_LAMP_BIND_POSITIONS_SLOT_UV7 LAVA_LAMP_BIND_POSITIONS_SLOT_UV8
             
             #pragma vertex LavaLampShadowVertexShader
@@ -727,5 +717,4 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
     }
 
     CustomEditor "Thry.ShaderEditor"
-	//CustomEditor "LavaLampShaderGUI"
 }

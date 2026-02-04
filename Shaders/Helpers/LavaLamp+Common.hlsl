@@ -11,12 +11,14 @@ static const float cSDFRaymarchMaxSteps = 100;
 
 #include "LavaLamp+SubregionParametersHelper.hlsl"
 
+SamplerState sampler_linear_repeat;
+
 float _Reflectiveness;
 float _MinReflectiveness;
 float _MinSpecular;
 float _MaxSpecular;
 
-sampler2D _RoughnessMap;
+Texture2D _RoughnessMap;
 float4 _RoughnessMap_ST;
 int _RoughnessMapUV;
 int _RoughnessChannel;
@@ -25,56 +27,66 @@ int _SpecularChannel;
 float _MinPerceptualRoughness;
 float _MaxPerceptualRoughness;
 
-sampler2D _NormalMap;
+Texture2D _NormalMap;
 float4 _NormalMap_ST;
 int _NormalUV;
 float _NormalStrength;
 
-sampler2D _TintMap;
+Texture2D _TintMap;
 float4 _TintMap_ST;
 int _TintMapUV;
 float4 _Tint;
 
-sampler2D _TintMask;
+Texture2D _TintMask;
 float4 _TintMask_ST;
 int _TintMaskUV;
 int _TintMaskChannel;
 
-bool _ColAdjToggle;
-bool _UseTintMaskColAdj;
-sampler2D _ColAdjMask;
-float4 _ColAdjMask_ST;
-int _ColAdjMaskUV;
-int _ColAdjMaskChannel;
-float _TintHue;
-float _TintSaturation;
-float _TintValue;
+//ifex _ColAdjToggle==0
+	bool _ColAdjToggle;
+	bool _UseTintMaskColAdj;
+	Texture2D _ColAdjMask;
+	float4 _ColAdjMask_ST;
+	int _ColAdjMaskUV;
+	int _ColAdjMaskChannel;
+	float _TintHue;
+	float _TintSaturation;
+	float _TintValue;
+//endex
 
-sampler2D _DecalMap;
-float4 _DecalMap_ST;
-int _DecalUV;
-float3 _Decal;
-float _DecalAlpha;
-sampler2D _DecalMask;
-float4 _DecalMask_ST;
-int _DecalMaskUV;
-int _DecalMaskChannel;
-bool _UseTintMaskDecal;
+//ifex _DecalToggle==0
+	bool _DecalToggle;
+	Texture2D _DecalMap;
+	float4 _DecalMap_ST;
+	int _DecalUV;
+	float3 _Decal;
+	float _DecalAlpha;
+	Texture2D _DecalMask;
+	float4 _DecalMask_ST;
+	int _DecalMaskUV;
+	int _DecalMaskChannel;
+	bool _UseTintMaskDecal;
+//endex
 
-sampler2D _EmiMap;
-float4 _EmiMap_ST;
-int _EmiMapUV;
-float4 _EmiCol;
-float _EmiStr;
-float _EmiHue;
-float _EmiSaturation;
-float _EmiValue;
+//ifex _EmiToggle ==0
+	bool _EmiToggle;
+	Texture2D _EmiMap;
+	float4 _EmiMap_ST;
+	int _EmiMapUV;
+	float4 _EmiCol;
+	float _EmiStr;
+	float _EmiHue;
+	float _EmiSaturation;
+	float _EmiValue;
 
-sampler2D _EmiMask;
-float4 _EmiMask_ST;
-int _EmiMaskUV;
-int _EmiMaskChannel;
-bool _UseTintMaskEmi;
+
+	Texture2D _EmiMask;
+	float4 _EmiMask_ST;
+	int _EmiMaskUV;
+	int _EmiMaskChannel;
+	bool _UseTintMaskEmi;
+
+//endex
 
 int _LavaSubregionCount;
 
@@ -88,6 +100,11 @@ float4 _BackgroundColor;
 bool _UseBackgroundCubemap;
 TextureCube _BackgroundCubemap;
 SamplerState sampler_BackgroundCubemap;
+
+int _BindDataMode;
+int _BindPositionsSlot;
+int _BindNormalsSlot;
+int __BindTangentsSlot;
 
 Texture3D<float> _SDFTexture;
 SamplerState sampler_SDFTexture;
@@ -106,7 +123,7 @@ UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 
 float GetRoughness(float2 uv)
 {
-	float perceptualRoughness = tex2D(_RoughnessMap,TRANSFORM_TEX(uv, _RoughnessMap))[_RoughnessChannel];
+	float perceptualRoughness = _RoughnessMap.Sample(sampler_linear_repeat,uv)[_RoughnessChannel];
     perceptualRoughness = saturate(lerp(_MinPerceptualRoughness, _MaxPerceptualRoughness, perceptualRoughness));
 
     //unity parameterizes roughness as sqrt of the actual BRDF roughness, for a more linear change in appearence
@@ -115,7 +132,7 @@ float GetRoughness(float2 uv)
 
 float3 GetMappedNormal(float2 uv, float3 worldNormal, float3 worldTangent, float3 worldBitangent, bool isFrontFace)
 {
-	float3 normalMap = UnpackNormal(tex2D(_NormalMap, TRANSFORM_TEX(uv, _NormalMap)));
+	float3 normalMap = UnpackNormal(_NormalMap.Sample(sampler_linear_repeat, uv));
     normalMap.xy *= _NormalStrength;
     normalMap = normalize(normalMap);
 
@@ -542,7 +559,7 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 
     //calculate the glass surface lighting
     float roughness = GetRoughness(uv[_RoughnessMapUV]);
-	float4 roughTex = tex2D(_RoughnessMap,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap));
+	float4 roughTex = _RoughnessMap.Sample(sampler_linear_repeat,uv[_RoughnessMapUV]);
 	float roughmap = roughTex[_RoughnessChannel];
 	float metalmap = roughTex[_ReflectiveChannel];
 	float specmap = roughTex[_SpecularChannel];
@@ -564,48 +581,56 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 
     float3 glassLighting = ambientSpecular * ReflectionProbeFresnel(mappedNormal, viewDirection, reflect, roughness);
 
-#ifdef LAVA_LAMP_USE_LIGHTING
-    UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
-    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, specular, lightAttenuation); //split this for specular slider
-    glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
-#endif
-
-    //set up and mask tint texture
-	float tintMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_TintMaskUV], _TintMask))[_TintMaskChannel];
-	float4 tintTex = tex2D(_TintMap, TRANSFORM_TEX(uv[_TintMapUV], _TintMap)) *  _Tint * tintMask + (1-tintMask);
+	//set up and mask tint texture
+	float tintMask = _TintMask.Sample(sampler_linear_repeat, uv[_TintMaskUV])[_TintMaskChannel];
+	float4 tintTex = _TintMap.Sample(sampler_linear_repeat, uv[_TintMapUV]) *  _Tint * tintMask + (1-tintMask);
 	float3 glassTint;
 	if (_ColAdjToggle){
 		float colMask;
 		if (!_UseTintMaskColAdj)
-			colMask = tex2D(_ColAdjMask,TRANSFORM_TEX(uv[_ColAdjMaskUV],_ColAdjMask))[_ColAdjMaskChannel];
+			colMask = _ColAdjMask.Sample(sampler_linear_repeat, uv[_ColAdjMaskUV])[_ColAdjMaskChannel];
 		else
-			colMask = tex2D(_TintMask,TRANSFORM_TEX(uv[_ColAdjMaskUV],_TintMask))[_ColAdjMaskChannel];
+			colMask = _TintMask.Sample(sampler_linear_repeat, uv[_ColAdjMaskUV])[_ColAdjMaskChannel];
 		glassTint = tintTex * (1-colMask) + (ModifyViaHSV(tintTex, _TintHue, _TintSaturation, _TintValue) * colMask);
 	}
 	else 
 		glassTint = tintTex;
 		
 	//set up and mask decal texture
-	float4 decal = tex2D(_DecalMap,TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,_DecalAlpha);
-	float decalMask;
-	if (_UseTintMaskDecal)
-		decalMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_DecalMaskUV], _TintMask))[_DecalMaskChannel];
-	else
-		decalMask = tex2D(_DecalMask, TRANSFORM_TEX(uv[_DecalMaskUV], _DecalMask))[_DecalMaskChannel];
-		
+	//ifex _DecalToggle == 0
+	float4 decal = _DecalMap.Sample(sampler_linear_repeat, uv[_DecalUV]) * (_Decal,_DecalAlpha);
+	if (_DecalToggle){
+		float decalMask;
+		if (_UseTintMaskDecal)
+			decalMask = _TintMask.Sample(sampler_linear_repeat, uv[_DecalMaskUV])[_DecalMaskChannel];
+		else
+			decalMask = _DecalMask.Sample(sampler_linear_repeat, uv[_DecalMaskUV])[_DecalMaskChannel];
+		decal *= decalMask;
+		lampColor = lampColor * (1-decal.a) + decal.a;
+		glassTint =  glassTint * (1-decal.a) + decal.rgb * decal.a;
+	}
+	//endex
+	
+	//ifex _EmiToggle == 0
 	//set up and mask emission
-	float4 emiMap = tex2D(_EmiMap,TRANSFORM_TEX(uv[_EmiMapUV], _EmiMap));
+	float4 emiMap = _EmiMap.Sample(sampler_linear_repeat, uv[_EmiMapUV]);
 	float emiMask; 
 	if (_UseTintMaskEmi)
-		emiMask = tex2D(_TintMask, TRANSFORM_TEX(uv[_EmiMaskUV], _EmiMask))[_EmiMaskChannel];
+		emiMask = _TintMask.Sample(sampler_linear_repeat, uv[_EmiMaskUV])[_EmiMaskChannel];
 	else
-		emiMask = tex2D(_EmiMask,TRANSFORM_TEX(uv[_EmiMaskUV], _EmiMask))[_EmiMaskChannel];
+		emiMask = _EmiMask.Sample(sampler_linear_repeat, uv[_EmiMaskUV])[_EmiMaskChannel];
 	float3 emissionTex = (emiMap.rgb * ModifyViaHSV(_EmiCol, _EmiHue, _EmiSaturation, _EmiValue) * emiMask) * _EmiStr;
+	//endex
+	
+#ifdef LAVA_LAMP_USE_LIGHTING
+    UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
+    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, specular, lightAttenuation);
+    glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
+#endif
 		
 	//composite the final color
 	float3 glassColor = (glassLighting + lampColor * glassTint * (1.0 - reflect)) * (1-decal.a);
-	float3 finalColor = glassColor + ((decal.rgb * max(_LightColor0.rgb, .01) * (dot(mappedNormal,_WorldSpaceLightPos0) * 0.5 + 0.5) + glassLighting) * decal.a);
-	finalColor = (finalColor * (1-(emiMask * _EmiStr)) + emissionTex);
+	float3 finalColor = glassColor + decal.rgb*decal.a;
 
     //apply fog (technically this will be applying fog to the background twice but it's not too noticeable in practice)
     UNITY_APPLY_FOG(input.fogCoord, finalColor);
@@ -631,7 +656,7 @@ float4 LavaLampLightingPixelShader(LavaLampLightingPixelInput input, bool isFron
     float3 worldBitangent = cross(input.worldNormal, input.worldTangent.xyz) * input.worldTangent.w * unity_WorldTransformParams.w;
     float3 mappedNormal = GetMappedNormal(uv[_NormalUV], input.worldNormal, input.worldTangent.xyz, worldBitangent, isFrontFace);
     float roughness = GetRoughness(uv[_RoughnessMapUV]);
-	float metalmap = tex2D(_RoughnessMap,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap))[_ReflectiveChannel];
+	float metalmap = _RoughnessMap.Sample(sampler_linear_repeat, uv[_RoughnessMapUV])[_ReflectiveChannel];
 	float reflect = max((_Reflectiveness * (metalmap)),_MinReflectiveness);
 
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
