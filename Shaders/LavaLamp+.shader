@@ -49,8 +49,8 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _DecalMaskChannel ("Channel", Integer) = 0
 		[Toggle] _UseTintMaskDecal ("Use Tint Mask--{offset:1}", Integer) = 0
 		[Toggle] _UseLightingDecal ("Use Lighting--{offset:1,condition_showS:_Lighting_Toggle==1}", Integer) = 0
-		_DecalMinBrightness       ("Min Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 1)) = 0
-		_DecalMaxBrightness       ("Max Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 10)) = 1
+		_DecalMinBrightness       ("Min Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 1)) = 0.0
+		_DecalMaxBrightness       ("Max Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 10)) = 1.0
 		[HideInInspector] m_end_Dec("", Float) = 0
 		
 		[HideInInspector] m_start_Emission ("Emission--{reference_property:_EmiToggle}", Float) = 0
@@ -70,11 +70,14 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Emission ("", Float) = 0
 		
 		[HideInInspector] m_start_RefSpec ("Roughness and Reflections", Float) = 0
-        _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_ReflectiveChannel,_SpecularChannel]}", 2D) = "black" {}
+        _RoughnessMap("Roughness & Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_InvertRoughness,_ReflectiveChannel,_InvertReflectiveness,_SpecularChannel,_InvertSpecular]}", 2D) = "black" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _RoughnessMapUV ("UV", Integer) = 0
-		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _RoughnessChannel ("Roughness Channel", Integer) = 0
-		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _ReflectiveChannel ("Reflectiveness Channel", Integer) = 1
-		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _SpecularChannel ("Specular Channel", Integer) = 2
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3, None ,4)] _RoughnessChannel ("Roughness Channel", Integer) = 0
+		[HideInInspector][Toggle] _InvertRoughness ("Invert Roughness", Integer) = 0
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3, None ,4)] _ReflectiveChannel ("Reflectiveness Channel", Integer) = 1
+		[HideInInspector][Toggle] _InvertReflectiveness ("Invert Reflectiveness", Integer) = 0
+		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3, None ,4)] _SpecularChannel ("Specular Mask Channel", Integer) = 2
+		[HideInInspector][Toggle] _InvertSpecular ("Invert Specular Mask", Integer) = 0
         _MinPerceptualRoughness("Min Roughness--{offset:1}", Range(0.0, 1.0)) = 0.1
         _MaxPerceptualRoughness("Max Roughness--{offset:1}", Range(0.0, 1.0)) = 1.0 
 		[Space]

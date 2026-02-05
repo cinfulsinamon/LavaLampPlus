@@ -22,8 +22,11 @@ Texture2D _RoughnessMap;
 float4 _RoughnessMap_ST;
 int _RoughnessMapUV;
 int _RoughnessChannel;
+bool _InvertRoughness;
 int _ReflectiveChannel;
+bool _InvertReflectiveness;
 int _SpecularChannel;
+bool _InvertSpecular;
 float _MinPerceptualRoughness;
 float _MaxPerceptualRoughness;
 
@@ -42,53 +45,47 @@ float4 _TintMask_ST;
 int _TintMaskUV;
 int _TintMaskChannel;
 
-#if _ColAdjToggle==1
-	bool _ColAdjToggle;
-	bool _UseTintMaskColAdj;
-	Texture2D _ColAdjMask;
-	float4 _ColAdjMask_ST;
-	int _ColAdjMaskUV;
-	int _ColAdjMaskChannel;
-	float _TintHue;
-	float _TintSaturation;
-	float _TintValue;
-#endif
+bool _ColAdjToggle;
+bool _UseTintMaskColAdj;
+Texture2D _ColAdjMask;
+float4 _ColAdjMask_ST;
+int _ColAdjMaskUV;
+int _ColAdjMaskChannel;
+float _TintHue;
+float _TintSaturation;
+float _TintValue;
 
-#if _DecalToggle==1
-	bool _DecalToggle;
-	Texture2D _DecalMap;
-	float4 _DecalMap_ST;
-	int _DecalUV;
-	float3 _Decal;
-	float _DecalAlpha;
-	Texture2D _DecalMask;
-	float4 _DecalMask_ST;
-	int _DecalMaskUV;
-	int _DecalMaskChannel;
-	bool _UseTintMaskDecal;
-	bool _UseLightingDecal;
-	float _DecalMinBrightness;
-	float _DecalMaxBrightness;
-#endif
+bool _DecalToggle;
+Texture2D _DecalMap;
+float4 _DecalMap_ST;
+int _DecalUV;
+float3 _Decal;
+float _DecalAlpha;
+Texture2D _DecalMask;
+float4 _DecalMask_ST;
+int _DecalMaskUV;
+int _DecalMaskChannel;
+bool _UseTintMaskDecal;
+bool _UseLightingDecal;
+float _DecalMinBrightness;
+float _DecalMaxBrightness;
 
-#if _EmiToggle ==1
-	bool _EmiToggle;
-	Texture2D _EmiMap;
-	float4 _EmiMap_ST;
-	int _EmiMapUV;
-	float4 _EmiCol;
-	float _EmiStr;
-	float _EmiHue;
-	float _EmiSaturation;
-	float _EmiValue;
+bool _EmiToggle;
+Texture2D _EmiMap;
+float4 _EmiMap_ST;
+int _EmiMapUV;
+float4 _EmiCol;
+float _EmiStr;
+float _EmiHue;
+float _EmiSaturation;
+float _EmiValue;
 
 
-	Texture2D _EmiMask;
-	float4 _EmiMask_ST;
-	int _EmiMaskUV;
-	int _EmiMaskChannel;
-	bool _UseTintMaskEmi;
-#endif
+Texture2D _EmiMask;
+float4 _EmiMask_ST;
+int _EmiMaskUV;
+int _EmiMaskChannel;
+bool _UseTintMaskEmi;
 
 int _LavaSubregionCount;
 
@@ -121,7 +118,9 @@ UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 float GetRoughness(float2 uv)
 {
 	float perceptualRoughness = _RoughnessMap.Sample(sampler_linear_repeat,TRANSFORM_TEX(uv,_RoughnessMap))[_RoughnessChannel];
-    perceptualRoughness = saturate(lerp(_MinPerceptualRoughness, _MaxPerceptualRoughness, perceptualRoughness));
+    if (_InvertRoughness)
+		perceptualRoughness = 1-perceptualRoughness ;
+	perceptualRoughness = saturate(lerp(_MinPerceptualRoughness, _MaxPerceptualRoughness, perceptualRoughness));
 
     //unity parameterizes roughness as sqrt of the actual BRDF roughness, for a more linear change in appearence
     return PerceptualRoughnessToRoughness(perceptualRoughness);
@@ -516,28 +515,30 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	uv[3] = input.uv3;
 	
 	//setup feature masks & textures
-	#if _ColAdjToggle == 1
-		float colAdjMask;
+	float colAdjMask;
+	if (_ColAdjToggle) {
 		if (_UseTintMaskColAdj)
 			colAdjMask = _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_ColAdjMaskUV],_TintMask))[_ColAdjMaskChannel];
 		else
 			colAdjMask = _ColAdjMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_ColAdjMaskUV],_ColAdjMask))[_ColAdjMaskChannel];
-	#endif
+	}
 	
-	#if _DecalToggle == 1
-		float4 decalMap = _DecalMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,1.0);
+	float4 decalMap;
+	if (_DecalToggle) {
+		decalMap = _DecalMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,1.0);
 		decalMap.a *= _DecalAlpha;
-	#endif
+	}
 	
-	#if _EmiToggle == 1
-		float4 emission = _EmiMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMapUV], _EmiMap)) * _EmiCol;
+	float4 emission;
+	if (_EmiToggle) {
+		emission = _EmiMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMapUV], _EmiMap)) * _EmiCol;
 		if (_UseTintMaskEmi)
 			emission *= _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMaskUV],_TintMask))[_EmiMaskChannel];
 		else
 			emission *= _EmiMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMaskUV],_EmiMask))[_EmiMaskChannel];
 		emission.rgb = ModifyViaHSV(emission, _EmiHue, _EmiSaturation, _EmiValue);
 		emission *= _EmiStr;
-	#endif
+	}
 	
     //get the viewing direction
     bool isOrthographic = UNITY_MATRIX_P._m33 != 0.0;
@@ -580,7 +581,15 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 
     //calculate the glass surface lighting
 
-    float roughness = GetRoughness(uv[_RoughnessMapUV]);
+    float roughness = (_RoughnessChannel == 4) ? _MinPerceptualRoughness : GetRoughness(uv[_RoughnessMapUV]);
+	float4 roughTex = _RoughnessMap.Sample(sampler_linear_repeat,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap));
+	float reflectMap = (_ReflectiveChannel == 4) ? _Reflectiveness : clamp(roughTex[_ReflectiveChannel],_Reflectiveness,_MaxReflectiveness);
+	if (_InvertReflectiveness)
+		reflectMap = 1- reflectMap;
+
+	float specMap = (_SpecularChannel == 4) ? _MinSpecular : clamp(roughTex[_SpecularChannel],_MinSpecular,_MaxSpecular);
+	if (_InvertSpecular)
+		specMap = 1 - specMap;
 
     //get the cubemap reflection
     float3 ambientSpecular = 0.0;
@@ -595,19 +604,18 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
         ambientSpecular = SampleBuiltInReflectionProbes(input.worldPos, mappedNormal, viewDirection, roughness);
     }
 
-    float3 glassLighting = ambientSpecular * ReflectionProbeFresnel(mappedNormal, viewDirection, _Reflectiveness, roughness);
+    float3 glassLighting = ambientSpecular * ReflectionProbeFresnel(mappedNormal, viewDirection, reflectMap, roughness);
 
 #ifdef LAVA_LAMP_USE_LIGHTING
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
-    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, _Reflectiveness, lightAttenuation);
+    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, specMap, lightAttenuation);
     glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
-	#if _DecalToggle == 1
+	if (_DecalToggle)
 		if (_UseLightingDecal) {
 			float3 minimum = _DecalMinBrightness;
 			float3 maximum = _DecalMaxBrightness;
-			decalMap.rgb *= max(minimum, min(_LightColor0.rgb, maximum)); 
+			decalMap.rgb *= clamp(_LightColor0.rgb, minimum, maximum); 
 		}
-	#endif
 #endif
 
     //composite the final color
@@ -615,21 +623,18 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	float tintMask = _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_TintMaskUV], _TintMask))[_TintMaskChannel];
     float3 glassTint = lerp(tintTex, tintTex * _Tint, tintMask);
 	
-	#if _ColAdjToggle == 1
+	if (_ColAdjToggle)
 		glassTint = lerp(glassTint, ModifyViaHSV(glassTint, _TintHue, _TintSaturation, _TintValue), colAdjMask);
-	#endif
 	
 	float3 surface = glassTint * lampColor;
 		
-	#if _DecalToggle == 1 
+	if (_DecalToggle) 
 		surface = lerp(surface, decalMap.rgb, decalMap.a);
-	#endif
 	
-    float3 finalColor = glassLighting + (surface * (1.0 - _Reflectiveness));
+    float3 finalColor = glassLighting + (surface * (1.0 - reflectMap));
 	
-	#if _EmiToggle==1
+	if (_EmiToggle)
 		finalColor += emission;
-	#endif
 	
     //apply fog (technically this will be applying fog to the background twice but it's not too noticeable in practice)
     UNITY_APPLY_FOG(input.fogCoord, finalColor);
@@ -654,10 +659,14 @@ float4 LavaLampLightingPixelShader(LavaLampLightingPixelInput input, bool isFron
     //get the surface lighting
     float3 worldBitangent = cross(input.worldNormal, input.worldTangent.xyz) * input.worldTangent.w * unity_WorldTransformParams.w;
     float3 mappedNormal = GetMappedNormal(uv[_NormalUV], input.worldNormal, input.worldTangent.xyz, worldBitangent, isFrontFace);
-    float roughness = GetRoughness(uv[_RoughnessMapUV]);
+	float roughness = (_RoughnessChannel == 4) ? _MinPerceptualRoughness : GetRoughness(uv[_RoughnessMapUV]);
+	float4 roughTex = _RoughnessMap.Sample(sampler_linear_repeat,TRANSFORM_TEX(uv[_RoughnessMapUV],_RoughnessMap));
+	float specMap = (_SpecularChannel == 4) ? _MinSpecular : clamp(roughTex[_SpecularChannel],_MinSpecular,_MaxSpecular);
+	if (_InvertSpecular)
+		specMap = 1 - specMap;
 
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
-    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, _Reflectiveness, lightAttenuation);
+    float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, specMap, lightAttenuation);
     float3 glassLighting = ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
 
     //apply fog
