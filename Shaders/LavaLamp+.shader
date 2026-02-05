@@ -23,6 +23,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
         [HDR] _BackgroundColor("Background Color", Color) = (0.0, 0.0, 0.0, 0.0)
         [Toggle] _UseBackgroundCubemap("Use Background Cubemap", Float) = 0.0
         [NoScaleOffset] _BackgroundCubemap("Background Cubemap--{offset:1}", Cube) = "black" {}
+		[ThryToggle(LAVA_LAMP_USE_TRANSPARENCY)] _Transparency_Toggle("Transparent Background", Float) = 1.0
 		[HideInInspector] m_end_ColNrm ("", Float) = 0
 		
 		[HideInInspector] m_start_ColAdj ("Color Adjust--{reference_property:_ColAdjToggle}", Float) = 0
@@ -47,12 +48,15 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _DecalMaskUV ("UV", Integer) = 0
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _DecalMaskChannel ("Channel", Integer) = 0
 		[Toggle] _UseTintMaskDecal ("Use Tint Mask--{offset:1}", Integer) = 0
+		[Toggle] _UseLightingDecal ("Use Lighting--{offset:1,condition_showS:_Lighting_Toggle==1}", Integer) = 0
+		_DecalMinBrightness       ("Min Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 1)) = 0
+		_DecalMaxBrightness       ("Max Brightness--{condition_showS:_UseLightingDecal==1 && _Lighting_Toggle==1}",          Range( 0, 10)) = 1
 		[HideInInspector] m_end_Dec("", Float) = 0
 		
 		[HideInInspector] m_start_Emission ("Emission--{reference_property:_EmiToggle}", Float) = 0
 		[HideInInspector][ToggleUI] _EmiToggle("Emission", Integer) = 0
-		_EmiCol("Emission Color", Color) = (1.0, 1.0, 1.0, 1.0)
-		_EmiStr       ("Emission Strength",          Range( 0, 1)) = 0
+		[HDR]_EmiCol("Emission Color", Color) = (1.0, 1.0, 1.0, 1.0)
+		_EmiStr       ("Emission Strength",          Range( 0, 20)) = 0
 		_EmiMap("Map--{reference_properties:[_EmiMapUV]}", 2D) = "white" {} 
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _EmiMapUV ("UV", Integer) = 0
 		_EmiMask("Mask--{reference_properties:[_EmiMaskUV,_EmiMaskChannel]}", 2D) = "white" {} 
@@ -66,7 +70,7 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
 		[HideInInspector] m_end_Emission ("", Float) = 0
 		
 		[HideInInspector] m_start_RefSpec ("Roughness and Reflections", Float) = 0
-        _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_ReflectiveChannel,_SpecularChannel]}", 2D) = "white" {}
+        _RoughnessMap("Roughness&Reflection Map--{reference_properties:[_RoughnessMapUV,_RoughnessChannel,_ReflectiveChannel,_SpecularChannel]}", 2D) = "black" {}
 		[HideInInspector][ThryWideEnum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _RoughnessMapUV ("UV", Integer) = 0
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _RoughnessChannel ("Roughness Channel", Integer) = 0
 		[HideInInspector][ThryWideEnum(R, 0, G, 1, B, 2, A, 3)] _ReflectiveChannel ("Reflectiveness Channel", Integer) = 1
@@ -74,8 +78,8 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
         _MinPerceptualRoughness("Min Roughness--{offset:1}", Range(0.0, 1.0)) = 0.1
         _MaxPerceptualRoughness("Max Roughness--{offset:1}", Range(0.0, 1.0)) = 1.0 
 		[Space]
-		_MinReflectiveness("Min Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 0.0
-		_Reflectiveness("Max Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 0.1
+		_Reflectiveness("Min Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 0.0
+		_MaxReflectiveness("Max Reflectiveness--{offset:1}", Range(0.0, 1.0)) = 1.0
 		[Space]
 		_MinSpecular("Min Specularity--{offset:1}", Range(0.0, 1.0)) = 0.0
 		_MaxSpecular("Max Specularity--{offset:1}", Range(0.0, 1.0)) = 1
@@ -604,7 +608,6 @@ Shader "normalizedcrow/Lava Lamp+ [cinfulsinamon]"
         [IntRange] _DepthOffset("Depth Offset", Range(-1.0, 1.0)) = 0.0
         _MaxSpecularHighlightBrightness("Max Specular Highlight Brightness", Float) = -1.0
         [ThryToggle(LAVA_LAMP_USE_LIGHTING)] _Lighting_Toggle("Surface Lighting", Float) = 1.0
-        [ThryToggle(LAVA_LAMP_USE_TRANSPARENCY)] _Transparency_Toggle("Transparent Background", Float) = 1.0
         [ThryToggle(LAVA_LAMP_DEPTH_INTERSECTION)] _DepthIntersection_Toggle("Lava Depth Intersection", Float) = 0.0
         [Toggle] _ZWrite("Write Depth", Int) = 1
 
