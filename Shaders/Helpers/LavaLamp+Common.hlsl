@@ -42,7 +42,7 @@ float4 _TintMask_ST;
 int _TintMaskUV;
 int _TintMaskChannel;
 
-//ifex _ColAdjToggle==0
+#if _ColAdjToggle==1
 	bool _ColAdjToggle;
 	bool _UseTintMaskColAdj;
 	Texture2D _ColAdjMask;
@@ -52,9 +52,9 @@ int _TintMaskChannel;
 	float _TintHue;
 	float _TintSaturation;
 	float _TintValue;
-//endex
+#endif
 
-//ifex _DecalToggle==0
+#if _DecalToggle==1
 	bool _DecalToggle;
 	Texture2D _DecalMap;
 	float4 _DecalMap_ST;
@@ -69,9 +69,9 @@ int _TintMaskChannel;
 	bool _UseLightingDecal;
 	float _DecalMinBrightness;
 	float _DecalMaxBrightness;
-//endex
+#endif
 
-//ifex _EmiToggle ==0
+#if _EmiToggle ==1
 	bool _EmiToggle;
 	Texture2D _EmiMap;
 	float4 _EmiMap_ST;
@@ -88,8 +88,7 @@ int _TintMaskChannel;
 	int _EmiMaskUV;
 	int _EmiMaskChannel;
 	bool _UseTintMaskEmi;
-
-//endex
+#endif
 
 int _LavaSubregionCount;
 
@@ -517,20 +516,20 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	uv[3] = input.uv3;
 	
 	//setup feature masks & textures
-	//ifex _ColAdjToggle == 0
+	#if _ColAdjToggle == 1
 		float colAdjMask;
 		if (_UseTintMaskColAdj)
 			colAdjMask = _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_ColAdjMaskUV],_TintMask))[_ColAdjMaskChannel];
 		else
 			colAdjMask = _ColAdjMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_ColAdjMaskUV],_ColAdjMask))[_ColAdjMaskChannel];
-	//endex
+	#endif
 	
-	//ifex _DecalToggle == 0
+	#if _DecalToggle == 1
 		float4 decalMap = _DecalMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_DecalUV], _DecalMap)) * (_Decal,1.0);
 		decalMap.a *= _DecalAlpha;
-	//endex
+	#endif
 	
-	//ifex _EmiToggle == 0
+	#if _EmiToggle == 1
 		float4 emission = _EmiMap.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMapUV], _EmiMap)) * _EmiCol;
 		if (_UseTintMaskEmi)
 			emission *= _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMaskUV],_TintMask))[_EmiMaskChannel];
@@ -538,7 +537,7 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 			emission *= _EmiMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_EmiMaskUV],_EmiMask))[_EmiMaskChannel];
 		emission.rgb = ModifyViaHSV(emission, _EmiHue, _EmiSaturation, _EmiValue);
 		emission *= _EmiStr;
-	//endex
+	#endif
 	
     //get the viewing direction
     bool isOrthographic = UNITY_MATRIX_P._m33 != 0.0;
@@ -577,7 +576,7 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
     float3 backgroundColor = GetBackground(input.worldPos, refractedViewDirection, thickness);
 
     //evaluate the lava lamp
-    float3 lampColor = GetLavaLampColor(input.bindPosition, traceDirection, thickness, backgroundColor, input.lavaIndex);
+    float3 lampColor = GetLavaLampColor(input.bindPosition, traceDirection, thickness, backgroundColor,input.lavaIndex);
 
     //calculate the glass surface lighting
 
@@ -602,11 +601,13 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
     UNITY_LIGHT_ATTENUATION(lightAttenuation, input, input.worldPos);
     float3 specularColor = GetDirectSpecularLighting(input.worldPos, mappedNormal, viewDirection, roughness, _Reflectiveness, lightAttenuation);
     glassLighting += ClampBrightness(specularColor, _MaxSpecularHighlightBrightness);
-	if (_UseLightingDecal) {
-		float3 minimum = _DecalMinBrightness;
-		float3 maximum = _DecalMaxBrightness;
-		decalMap.rgb *= max(minimum, min(_LightColor0.rgb, maximum)); 
-	}
+	#if _DecalToggle == 1
+		if (_UseLightingDecal) {
+			float3 minimum = _DecalMinBrightness;
+			float3 maximum = _DecalMaxBrightness;
+			decalMap.rgb *= max(minimum, min(_LightColor0.rgb, maximum)); 
+		}
+	#endif
 #endif
 
     //composite the final color
@@ -614,19 +615,22 @@ float4 LavaLampBasePixelShader(LavaLampBasePixelInput input, bool isFrontFace : 
 	float tintMask = _TintMask.Sample(sampler_linear_repeat, TRANSFORM_TEX(uv[_TintMaskUV], _TintMask))[_TintMaskChannel];
     float3 glassTint = lerp(tintTex, tintTex * _Tint, tintMask);
 	
-	if (_ColAdjToggle)
+	#if _ColAdjToggle == 1
 		glassTint = lerp(glassTint, ModifyViaHSV(glassTint, _TintHue, _TintSaturation, _TintValue), colAdjMask);
-		
+	#endif
+	
 	float3 surface = glassTint * lampColor;
 		
-	if (_DecalToggle) 
+	#if _DecalToggle == 1 
 		surface = lerp(surface, decalMap.rgb, decalMap.a);
-		
+	#endif
+	
     float3 finalColor = glassLighting + (surface * (1.0 - _Reflectiveness));
 	
-	if (_EmiToggle)
+	#if _EmiToggle==1
 		finalColor += emission;
-
+	#endif
+	
     //apply fog (technically this will be applying fog to the background twice but it's not too noticeable in practice)
     UNITY_APPLY_FOG(input.fogCoord, finalColor);
 
